@@ -1,6 +1,5 @@
 %empieza base de conocimiento
 %nombre, salud, escudo, energia, velocidad
-
 warframe(ash, 455, 270, 100, 1.15).
 warframe(atlas, 270, 270, 175, 0.9).
 warframe(banshee, 270, 270, 175, 1.1).
@@ -31,7 +30,6 @@ warframe(loki, 180, 180, 175, 1.25).
 warframe(mag, 180, 455, 140, 1).
 warframe(mesa, 365, 180, 100, 1.1).
 warframe(mirage, 200, 200, 175, 1.2).
-
 %faccion, salud, escudo, energia, velocidad
 faccion(tenno, 1.05, 1.05, 1.05, 1.05).
 faccion(grinner, 1, 1, 1.1, 1).
@@ -43,13 +41,11 @@ faccion(stalker, 1, 1, 0.95, 1.15).
 faccion(sindicato, 1, 1.15, 1, 0.95).
 faccion(sinafiliacion, 1, 1, 1, 1).
 %termina base de conocimiento
-
 :- dynamic contador/1.
 contador(0).
 
 %inicia actualizar_faccion
 actualizar_faccion(WF,F,S1,ES1,EN1,V1,WF2,F2,S2,ES2,EN2,V2) :-
-    
     warframe(WF, S1b, ES1b, EN1b, V1b),
     faccion(F, FS1, FES1, FEN1, FV1),
 	warframe(WF2, S2b, ES2b, EN2b, V2b),
@@ -64,19 +60,15 @@ actualizar_faccion(WF,F,S1,ES1,EN1,V1,WF2,F2,S2,ES2,EN2,V2) :-
     ES2 is ES2b * FES2,
     EN2 is EN2b * FEN2,
     V2 is V2b * FV2.
-
 %termina actualizar_faccion
-
 
 %empieza actualizar_rango
 actualizar_rango(WF, F, R1, S1, ES1, EN1, WF2, F2, R2, S2, ES2, EN2,T):-
-    
     actualizar_faccion(WF, F, S1b, ES1b, EN1b, V1b, WF2, F2, S2b, ES2b, EN2b, V2b),
     
     (R2 @> 30 -> R2b is 30
     ;
    		(R2 @< 0 -> R2b is 1
-     
     	;
      		R2b is R2
     	)
@@ -84,7 +76,6 @@ actualizar_rango(WF, F, R1, S1, ES1, EN1, WF2, F2, R2, S2, ES2, EN2,T):-
 
     (R1 @> 30 -> R1b is 30;
     	(R1 @< 0 -> R1b is 1
-     
     	;
      		R1b is R1
     	)
@@ -104,7 +95,6 @@ actualizar_rango(WF, F, R1, S1, ES1, EN1, WF2, F2, R2, S2, ES2, EN2,T):-
     ;
      V1 @< V2 -> T = 2
     ).
-
 %termina actualizar_rango
 
 %inicia batel
@@ -138,10 +128,8 @@ batel(WIN, TURN, S1, ES1, EN1, S2, ES2, EN2) :-
         ;   
             WIN = -1
         )
-    	
     ).
 %termina batel
-
 
 %inicia ganador
 ganador(WIN):-
@@ -150,44 +138,37 @@ ganador(WIN):-
     ;
         write('Ganó el luchador dos'),nl
     ).
-
 %termina ganador
-    
     
 %empieza inicio_batalla
 inicio_batalla(WF1, F1, R1, WF2, F2, R2):-
-    
     actualizar_rango(WF1, F1, R1, S1, ES1, EN1, WF2, F2, R2, S2, ES2, EN2,T), 
     batel(WIN, T, S1, ES1, EN1, S2, ES2, EN2),
     ganador(WIN).
 %termina inicio_batalla
+%Empieza la batalla de un warframe lista 1 contra los 5 de la lista 2
 batalla2(_,_,_,[]).
 batalla2(WF, F, R, [[WF1,F1,R1]|Equipo2]):-
     actualizar_rango(WF, F, R, S, ES, EN, WF1, F1, R1, S1, ES1, EN1, T),
     batel(WIN, T, S, ES, EN, S1, ES1, EN1),
     contador(C),
     A is C + WIN,
-    
     retractall(contador(_)),
 	assert(contador(A)),
-    
-    
     batalla2(WF, F, R,Equipo2).
-    
+%TERMINA la batalla de un warframe lista 1 contra los 5 de la lista 2
+
+%Empieza la batalla de un warframe lista 1 contra los de la lista 2
 batalla1([],_).
 batalla1([[WF, F, R]|Equipo1], [[WF1,F1,R1]|Equipo2]) :-
 	Lista = [[WF1,F1,R1]|Equipo2],
-    
     batalla2(WF, F, R, Lista),
-	
     batalla1(Equipo1, Lista).
 
 inicio_equipo([[WF, F, R]|Equipo1], [[WF1,F1,R1]|Equipo2]):-
     L1=[[WF, F, R]|Equipo1],
     L2=[[WF1,F1,R1]|Equipo2],
-    
     batalla1(L1,L2),
-    
     contador(C),
     (C @> 0 ->
         write('Ganó el equipo uno'),nl
